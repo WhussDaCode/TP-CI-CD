@@ -97,28 +97,27 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-deploy:
-  name: Deploy Application
-  needs: build-and-push
-  runs-on: ubuntu-latest
-  if: github.ref == 'refs/heads/master'
-  env:
-    IMAGE_NAME: ghcr.io/les-petits-foufou/tp-ci-cd
-    DATABASE_URL: $${{ secrets.DATABASE_URL }}
-    JWT_SECRET: $${{ secrets.JWT_SECRET }}
-  steps:
-    - uses: actions/checkout@v4
-
-    - name: Log in to GitHub Container Registry
-      uses: docker/login-action@v2
-      with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Deploy
-      run: |
-        docker compose -f docker/docker-compose.yml pull
-        docker compose -f docker/docker-compose.yml down
-        docker compose -f docker/docker-compose.yml up -d
-
+  deploy:
+    name: Deploy Application
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+    env:
+      IMAGE_NAME: ghcr.io/les-petits-foufou/tp-ci-cd
+      DATABASE_URL: $${{ secrets.DATABASE_URL }}
+      JWT_SECRET: $${{ secrets.JWT_SECRET }}
+    steps:
+      - uses: actions/checkout@v4
+  
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+  
+      - name: Deploy
+        run: |
+          docker compose -f docker/docker-compose.yml pull
+          docker compose -f docker/docker-compose.yml down
+          docker compose -f docker/docker-compose.yml up -d
