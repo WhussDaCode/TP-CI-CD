@@ -97,22 +97,22 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-  # ✅ AJOUT : CONTINUOUS DEPLOYMENT
-  deploy:
-    name: Deploy Application (Docker)
-    needs: build-and-push
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
+deploy:
+  name: Deploy Application (Docker)
+  needs: build-and-push
+  runs-on: ubuntu-latest
+  if: github.ref == 'refs/heads/master'
 
-    env:
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+  env:
+    IMAGE_NAME: ghcr.io/${{ github.repository }}
+    DATABASE_URL: ${{ secrets.DATABASE_URL }}
+    JWT_SECRET: ${{ secrets.JWT_SECRET }}
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+  steps:
+    - uses: actions/checkout@v4
 
-      - name: Deploy with Docker Compose (Recreate strategy)
-        run: |
-          docker compose -f docker/docker-compose.yml down
-          docker compose -f docker/docker-compose.yml up -d
+    - name: Deploy
+      run: |
+        docker compose -f docker/docker-compose.yml down
+        docker compose -f docker/docker-compose.yml up -d
+
