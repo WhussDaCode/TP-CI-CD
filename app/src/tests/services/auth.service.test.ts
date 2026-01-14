@@ -2,7 +2,22 @@ import * as bcrypt from 'bcryptjs';
 import { createUser, getCurrentUser, login, updateUser } from '../../app/routes/auth/auth.service';
 import prismaMock from '../prisma-mock';
 
+// ============================================================================
+// FIX CRITIQUE : On intercepte l'appel au vrai Prisma Client
+// On force l'utilisation du Mock défini dans prisma-mock
+// ============================================================================
+jest.mock('../../app/prisma/prisma-client', () => ({
+  __esModule: true,
+  default: prismaMock, 
+  prisma: prismaMock   // On gère les deux types d'exports pour être sûr
+}));
+
 describe('AuthService', () => {
+  // On nettoie les mocks entre chaque test pour éviter les effets de bord
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   describe('createUser', () => {
     test('should create new user ', async () => {
       // Given
