@@ -98,7 +98,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
 
 deploy:
-  name: Deploy Application (Docker)
+  name: Deploy Application
   needs: build-and-push
   runs-on: ubuntu-latest
   if: github.ref == 'refs/heads/master'
