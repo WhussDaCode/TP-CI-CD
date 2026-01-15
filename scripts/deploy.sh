@@ -1,0 +1,10 @@
+#!/bin/bash
+set -e
+echo "🚀 Deploying..."
+# Commandes de redémarrage simplifiées pour la documentation
+docker stop api-container || true
+docker rm api-container || true
+docker run -d --name api-container --restart always -p 3000:3000 \
+  -e DATABASE_URL="$DATABASE_URL" \
+  -e JWT_SECRET="$JWT_SECRET" \
+  ghcr.io/les-petits-foufou/tp-ci-cd:latest
