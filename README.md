@@ -1,74 +1,186 @@
-# ![Node/Express/Prisma Example App](project-logo.png)
+# TP CI/CD – RealWorld Node.js API
 
-[![Build Status](https://travis-ci.org/anishkny/node-express-realworld-example-app.svg?branch=master)](https://travis-ci.org/anishkny/node-express-realworld-example-app)
+---
 
-> ### Example Node (Express + Prisma) codebase containing real world examples (CRUD, auth, advanced patterns, etc) that adheres to the [RealWorld](https://github.com/gothinkster/realworld-example-apps) API spec.
+## Présentation du projet
 
-<a href="https://thinkster.io/tutorials/node-json-api" target="_blank"><img width="454" src="https://raw.githubusercontent.com/gothinkster/realworld/master/media/learn-btn-hr.png" /></a>
+Ce projet a été réalisé dans le cadre du **TP CI/CD DevOps**.  
+L’objectif est de concevoir, implémenter et documenter une **pipeline CI/CD complète**, automatisée et sécurisée pour une application web.
 
-## Getting Started
+L’application utilisée est basée sur le projet open-source **RealWorld – Node.js / Express**, une API REST représentative d’un environnement de production réel.
 
-### Prerequisites
+Le projet est **déployé exclusivement sur Google Cloud Platform (GCP)** et accessible publiquement.
 
-Run the following command to install dependencies:
+---
 
-```shell
-npm install
+## Accès à l’application
+
+**Lien public pour accéder à l’application :**  
+**http://35.241.185.143:3000/**
+
+---
+
+## Objectifs pédagogiques
+
+- Comprendre les principes CI/CD et DevOps
+- Mettre en place une pipeline automatisée
+- Automatiser :
+  - les tests
+  - le build
+  - la génération d’artefacts
+  - le déploiement
+- Utiliser Docker et GitHub Actions
+- Déployer une application sur le cloud (Google Cloud)
+- Gérer les secrets de manière sécurisée
+- Documenter l’architecture CI/CD
+
+---
+
+## Technologies utilisées
+
+- **Node.js / Express**
+- **Nx**
+- **Prisma**
+- **PostgreSQL**
+- **Docker**
+- **GitHub Actions**
+- **GitHub Container Registry (GHCR)**
+- **Google Cloud Platform (VM Compute Engine)**
+
+---
+
+## Structure du dépôt
+
+```text
+les-petits-foufou-tp-ci-cd/
+│
+├── app/                          # Code source de l'application
+│   ├── src/
+│   ├── prisma/
+│   ├── tests/
+│   └── package.json
+│
+├── docker/
+│   ├── Dockerfile
+│   └── docker-compose.yml
+│
+├── .github/
+│   └── workflows/
+│       └── ci-cd.yml             # Pipeline CI/CD GitHub Actions
+│
+├── .dockerignore
+├── .eslintrc.json
+├── .prettierrc
+├── SECURITY.md
+└── README.md
 ```
 
-### Environment variables
+## Architecture CI/CD
 
-This project depends on some environment variables.
-If you are running this project locally, create a `.env` file at the root for these variables.
-Your host provider should included a feature to set them there directly to avoid exposing them.
+```mermaid
+flowchart LR
+    A[Push / Pull Request]
+    B[GitHub Actions - CI]
+    C[Tests automatisés]
+    D[Build image Docker]
+    E[GitHub Container Registry]
+    F[VM Google Cloud]
+    G[Application accessible en ligne]
 
-Here are the required ones:
-
-```
-DATABASE_URL=
-JWT_SECRET=
-NODE_ENV=production
-```
-
-### Generate your Prisma client
-
-Run the following command to generate the Prisma Client which will include types based on your database schema:
-
-```shell
-npx prisma generate
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
 ```
 
-### Apply any SQL migration script
+## Déclenchement de la pipeline
 
-Run the following command to create/update your database based on existing sql migration scripts:
+La pipeline CI/CD est automatiquement déclenchée lors de :
 
-```shell
-npx prisma migrate deploy
+- `push` sur la branche **main**
+- `pull_request` vers la branche **main**
+
+---
+
+## CI – Continuous Integration
+
+### 1️-Installation des dépendances
+
+- Installation des dépendances **Node.js**
+- Préparation de l’environnement de build
+
+### 2️-Tests automatisés
+
+- Exécution des tests unitaires
+- Échec automatique de la pipeline si un test échoue
+
+### 3️-Qualité de code
+
+- Vérification **ESLint**
+- Respect des conventions de développement
+
+---
+
+## Build & Artifacts
+
+### Construction de l’image Docker
+
+- Build de l’image Docker à partir du `Dockerfile`
+- Tags appliqués :
+  - `latest`
+  - SHA du commit
+
+**Exemple :**
+```bash
+ghcr.io/les-petits-foufou/tp-ci-cd:latest
 ```
 
-### Run the project
+# Registry
 
-Run the following command to run the project:
+Les images Docker sont stockées sur **GitHub Container Registry (GHCR)**.
 
-```shell
-npx nx serve api
-```
+---
 
-### Seed the database
+## CD – Continuous Deployment
 
-The project includes a seed script to populate the database:
+### Environnement de déploiement
+- **Plateforme :** Google Cloud Platform  
+- **VM :** Compute Engine  
+- **Déploiement :** via Docker  
 
-```shell
-npx prisma db seed
-```
+### Stratégie de déploiement
+**Recreate**  
+1. Arrêt du conteneur existant sur la VM  
+2. Pull de la nouvelle image Docker  
+3. Redémarrage du conteneur  
 
-## Deploy on a remote server
+---
 
-Run the following command to:
-- install dependencies
-- apply any new migration sql scripts
-- run the server
+## Sécurité & gestion des secrets
 
-```shell
-npm ci && npx prisma migrate deploy && node dist/api/main.js
-```
+- Aucun secret stocké dans le dépôt Git  
+- Utilisation des **GitHub Secrets**  
+- Accès sécurisé à la VM Google Cloud  
+
+### Secrets utilisés
+- `DATABASE_URL`  
+- `JWT_SECRET`  
+- `GHCR_TOKEN`  
+
+### Secrets d’accès à la VM Google Cloud
+- Détails disponibles dans `SECURITY.md`  
+
+---
+
+## Déploiement et accès
+
+Le déploiement est entièrement automatisé via la pipeline CI/CD :  
+1. Tests  
+2. Build de l’image Docker  
+3. Push vers GHCR  
+4. Déploiement automatique sur Google Cloud  
+
+**Application accessible à l’adresse suivante :**  
+[http://35.241.185.143:3000/](http://35.241.185.143:3000/)
