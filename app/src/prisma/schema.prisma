@@ -6,20 +6,22 @@ datasource db {
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = []
+  // AJOUT INDISPENSABLE POUR DEBIAN 12
+  binaryTargets   = ["native", "debian-openssl-3.0.x"]
 }
 
 model Article {
-  id          Int       @id @default(autoincrement())
-  slug        String    @unique
+  id          Int      @id @default(autoincrement())
+  slug        String   @unique
   title       String
   description String
   body        String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
   tagList     Tag[]
-  author      User      @relation("UserArticles", fields: [authorId], onDelete: Cascade, references: [id])
+  author      User     @relation("UserArticles", fields: [authorId], onDelete: Cascade, references: [id])
   authorId    Int
-  favoritedBy User[]    @relation("UserFavorites")
+  favoritedBy User[]   @relation("UserFavorites")
   comments    Comment[]
 }
 
